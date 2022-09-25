@@ -5,11 +5,6 @@ def compute_inverse(matrix: np.array, log_output=True) -> np.array:
     """
     Calculates the inverse of a 2D matrix, A, by setting up
     the augmented matrix [A | I], where I is the identity matrix.
-
-    (I believe this constitues Gauss-Jordan Elimination, but I am not sure).
-
-    Assumption: that all values in the matrix are positive 
-                (in some cases I guess it might still work with 0 included). 
     """
     # A: setup
     A = matrix
@@ -40,7 +35,7 @@ def compute_inverse(matrix: np.array, log_output=True) -> np.array:
             AI = np.append(AI, [row], axis=0)
     if log_output:
         print("Augmented matrix AI: \n", AI)
-    # C: return the inverse --> we want all of (:rows, ncols+1:)
+    # C: return the inverse
     return AI[:, ncols:]
 
 
