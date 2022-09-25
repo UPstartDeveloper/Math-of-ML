@@ -1,4 +1,8 @@
+#!/usr/bin/env python3
+# Part 1
 import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 
 
 def compute_inverse(matrix: np.array, log_output=True) -> np.array:
@@ -45,5 +49,38 @@ def compute_inverse(matrix: np.array, log_output=True) -> np.array:
 
 
 if __name__ == "__main__":
-    A = np.array(([3, 4], [-1, 6], [0, 7], [2, 5]))  # test case
-    compute_inverse(A)
+    # Part 2
+    df = pd.read_csv("./salary_data.csv")
+
+    # Part 3
+    df.head()
+
+    # Part 4
+    plt.scatter(df["YearsExperience"], df["Salary"])
+    plt.xlabel("YearsExperience")
+    plt.ylabel("Salary")
+    plt.title("Employee Salaries (Differents Yr. of Experience)")
+    plt.show()
+
+    # Part 5
+    A = np.concatenate(
+        (np.ones((df.shape[0], 1)), df["YearsExperience"].values.reshape(-1, 1)),
+        axis=-1,
+    )
+    b = df["Salary"].values.reshape(-1, 1)
+
+    pseudo_inverse = np.array([np.dot(compute_inverse(np.dot(A.T, A)), A.T)])
+
+    theta = np.dot(pseudo_inverse, b)
+
+    # Part 6
+    y_pred = np.dot(A, theta).squeeze()
+
+    fig, ax = plt.subplots()
+
+    ax.scatter(df["YearsExperience"], df["Salary"])
+    ax.plot(df["YearsExperience"], y_pred, color="red")
+    plt.title("Employee Salaries (Differents Yr. of Experience)")
+    plt.xlabel("YearsExperience")
+    plt.ylabel("Salary")
+    plt.show()
