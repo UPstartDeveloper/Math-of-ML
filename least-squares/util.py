@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def compute_inverse(matrix: np.array) -> np.array:
+def compute_inverse(matrix: np.array, log_output=True) -> np.array:
     """
     Calculates the inverse of a 2D matrix, A, by setting up
     the augmented matrix [A | I], where I is the identity matrix.
@@ -14,10 +14,10 @@ def compute_inverse(matrix: np.array) -> np.array:
     # A: setup
     A = matrix
     nrows, ncols = A.shape
-    identity = np.eye(nrows, ncols)
-    augmented_mat = np.concatenate((A, identity), axis=1)
-    AI = augmented_mat
-    # B: get to RREF of A
+    identity_matrix = np.eye(nrows, ncols)
+    augmented_matrix = np.concatenate((A, identity_matrix), axis=1)
+    AI = augmented_matrix
+    # B: try to get A into RREF
     diagonal_length = min(nrows, ncols)
     # for each diagonal elem --> use an index i
     for i in range(diagonal_length):
@@ -30,19 +30,20 @@ def compute_inverse(matrix: np.array) -> np.array:
         # for the rows above/below row i, with nonzeros in the ith col:
         for row_index in range(nrows):
             if row_index != i and AI[row_index, i] != 0:
-                # multiply through their row by (m, i) * -1
+                # do the row transformation
                 AI[row_index, :] += ((-1 * AI[row_index, i]) * AI[i, :])
     # if any rows are all zeros --> move them to the bottom
     for row_index in range(AI.shape[0]):
         row = AI[row_index]
-        if row.sum() == 0.:
+        if np.array_equal(row, np.zeros(ncols,)):
             AI = np.delete(AI, row_index, axis=0)
-            AI = np.append(AI, row, axis=0)
-    print("Augmented matrix AI: \n", AI)
+            AI = np.append(AI, [row], axis=0)
+    if log_output:
+        print("Augmented matrix AI: \n", AI)
     # C: return the inverse --> we want all of (:rows, ncols+1:)
-    return AI[:, ncols + 1:]
+    return AI[:, ncols:]
 
 
 if __name__ == "__main__":
-    A = np.array(([3, 4], [1, 6], [1, 7], [2, 5]))  # test case
+    A = np.array(([3, 4], [-1, 6], [0, 7], [2, 5]))  # test case
     compute_inverse(A)
