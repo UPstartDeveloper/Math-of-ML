@@ -15,7 +15,7 @@
 
 # **Download the dataset from here:** https://grouplens.org/datasets/movielens/1m/
 
-# In[21]:
+# In[40]:
 
 
 # Import all the required libraries
@@ -26,7 +26,7 @@ import pandas as pd
 # ## Reading the Data
 # Now that we have downloaded the files from the link above and placed them in the same directory as this Jupyter Notebook, we can load each of the tables of data as a CSV into Pandas. Execute the following, provided code.
 
-# In[22]:
+# In[41]:
 
 
 # Read the dataset from the two files into ratings_data and movies_data
@@ -34,14 +34,14 @@ column_list_ratings = ["UserID", "MovieID", "Ratings","Timestamp"]
 ratings_data  = pd.read_csv('ratings.dat',sep='::',names = column_list_ratings, engine="python")
 
 
-# In[23]:
+# In[42]:
 
 
 print(ratings_data.shape)
 ratings_data.head()
 
 
-# In[24]:
+# In[43]:
 
 
 column_list_movies = ["MovieID","Title","Genres"]
@@ -49,20 +49,20 @@ column_list_movies = ["MovieID","Title","Genres"]
 movies_data = pd.read_csv('movies.dat',sep = '::',names = column_list_movies, engine="python", encoding='unicode_escape')
 
 
-# In[25]:
+# In[44]:
 
 
 print(movies_data.shape)
 movies_data.head()
 
 
-# In[26]:
+# In[45]:
 
 
 movies_data["Title"].nunique()  # just curious
 
 
-# In[27]:
+# In[46]:
 
 
 a = movies_data["MovieID"].unique() # just curious
@@ -72,21 +72,21 @@ a[:70]
 
 # `ratings_data`, `movies_data`, `user_data` corresponds to the data loaded from `ratings.dat`, `movies.dat`, and `users.dat` in Pandas.
 
-# In[28]:
+# In[47]:
 
 
 column_list_users = ["UserID","Gender","Age","Occupation","Zixp-code"]
 user_data = pd.read_csv("users.dat",sep = "::",names = column_list_users, engine="python")
 
 
-# In[29]:
+# In[48]:
 
 
 print(user_data.shape)
 user_data.head()
 
 
-# In[30]:
+# In[49]:
 
 
 user_data["UserID"].nunique() # just curious to see if there are duplicates
@@ -96,7 +96,7 @@ user_data["UserID"].nunique() # just curious to see if there are duplicates
 
 # We now have all our data in Pandas - however, it's as three separate datasets! To make some more sense out of the data we have, we can use the Pandas `merge` function to combine our component data-frames. Run the following code:
 
-# In[31]:
+# In[50]:
 
 
 data=pd.merge(pd.merge(ratings_data,user_data),movies_data)
@@ -106,7 +106,7 @@ data.head()
 
 # Next, we can create a pivot table to match the ratings with a given movie title. Using `data.pivot_table`, we can aggregate (using the average/`mean` function) the reviews and find the average rating for each movie. We can save this pivot table into the `mean_ratings` variable. 
 
-# In[32]:
+# In[51]:
 
 
 mean_ratings=data.pivot_table('Ratings','Title',aggfunc='mean')
@@ -115,7 +115,7 @@ mean_ratings
 
 # Now, we can take the `mean_ratings` and sort it by the value of the rating itself. Using this and the `head` function, we can display the top 15 movies by average rating.
 
-# In[33]:
+# In[52]:
 
 
 mean_ratings=data.pivot_table('Ratings',index=["Title"],aggfunc='mean')
@@ -125,7 +125,7 @@ top_15_mean_ratings
 
 # Let's adjust our original `mean_ratings` function to account for the differences in gender between reviews. This will be similar to the same code as before, except now we will provide an additional `columns` parameter which will separate the average ratings for men and women, respectively.
 
-# In[34]:
+# In[53]:
 
 
 mean_ratings=data.pivot_table('Ratings',index=["Title"],columns=["Gender"],aggfunc='mean')
@@ -134,7 +134,7 @@ mean_ratings
 
 # We can now sort the ratings as before, but instead of by `Rating`, but by the `F` and `M` gendered rating columns. Print the top rated movies by male and female reviews, respectively.
 
-# In[35]:
+# In[54]:
 
 
 data=pd.merge(pd.merge(ratings_data,user_data),movies_data)
@@ -144,7 +144,7 @@ top_female_ratings = mean_ratings.sort_values(by='F', ascending=False)
 print(top_female_ratings.head(15))
 
 
-# In[36]:
+# In[55]:
 
 
 top_male_ratings = mean_ratings.sort_values(by='M', ascending=False)
@@ -153,7 +153,7 @@ print(top_male_ratings.head(15))
 
 # Zain: the next cell adds an additional column, just to see the difference between the avg rating given by men and women for a given film?
 
-# In[37]:
+# In[56]:
 
 
 mean_ratings['diff'] = mean_ratings['M'] - mean_ratings['F']
@@ -163,7 +163,7 @@ sorted_by_diff[:10]
 
 # Let's try grouping the data-frame, instead, to see how different titles compare in terms of the number of ratings. Group by `Title` and then take the top 10 items by number of reviews. We can see here the most popularly-reviewed titles.
 
-# In[38]:
+# In[57]:
 
 
 ratings_by_title=data.groupby('Title').size()
@@ -172,13 +172,13 @@ ratings_by_title.sort_values(ascending=False).head(10)
 
 # Similarly, we can filter our grouped data-frame to get all titles with a certain number of reviews. Filter the dataset to get all movie titles such that the number of reviews is >= 2500.
 
-# In[39]:
+# In[58]:
 
 
 ratings_by_title_over_2500 = ratings_by_title[ratings_by_title > 2500]
 
 
-# In[40]:
+# In[59]:
 
 
 # sanity check
@@ -196,7 +196,7 @@ if ratings_by_title_over_2500.min()  > 2500:
 # - If you're stuck, you might want to look into the `np.ndarray` datatype and how to create one of the desired shape.
 # - Every review lies between 1 and 5, and thus fits within a `uint8` datatype, which you can specify to numpy.
 
-# In[41]:
+# In[60]:
 
 
 ### use numpy to create a ratings data matrix
@@ -205,19 +205,19 @@ nr_movies = np.max(ratings_data.MovieID.values)
 ratings_matrix = np.ndarray(shape=(nr_users, nr_movies),dtype=np.uint8)
 
 
-# In[42]:
+# In[61]:
 
 
 ratings_matrix[ratings_data.UserID.values - 1, ratings_data.MovieID.values - 1] = ratings_data.Ratings.values
 
 
-# In[51]:
+# In[62]:
 
 
 ratings_data.MovieID.values
 
 
-# In[43]:
+# In[63]:
 
 
 # Print the shape
@@ -225,7 +225,7 @@ ratings = ratings_matrix
 print(ratings.shape)
 
 
-# In[44]:
+# In[64]:
 
 
 # sanity check - no np.nan values, yes?
@@ -246,20 +246,20 @@ np.isnan(ratings).sum()
 
 # Quick sanity check: are there any remaining `NaN` values (aka zero)?
 
-# In[45]:
+# In[65]:
 
 
 ratings_normalization = (ratings_matrix - ratings_matrix.mean(axis = 0))/ratings_matrix.std(axis = 0) #normalize the data
 
 
-# In[46]:
+# In[66]:
 
 
-ratings_no_nan = ratings.copy()
+ratings_no_nan = ratings_normalization.copy()
 ratings_no_nan[np.isnan(ratings_no_nan)] = 0
 
 
-# In[48]:
+# In[67]:
 
 
 ratings_no_nan.shape
@@ -269,7 +269,7 @@ ratings_no_nan.shape
 
 # We're now going to perform Singular Value Decomposition (SVD) on the normalized ratings matrix from the previous question. Perform the process using numpy, and along the way print the shapes of the $U$, $S$, and $V$ matrices you calculated.
 
-# In[49]:
+# In[68]:
 
 
 # Compute the SVD of the normalised matrix
@@ -277,7 +277,7 @@ U, S, V = np.linalg.svd(ratings_no_nan)
 S = np.diag(S)
 
 
-# In[50]:
+# In[69]:
 
 
 # Print the shapes
@@ -290,20 +290,20 @@ print(U.shape, S.shape, V.shape)
 
 # Which col did we put Batman Returns in? --> let's verify the `ratings_matrix` variable against the original `data` variable. 
 
-# In[63]:
+# In[70]:
 
 
 data[data["Title"] == "Batman Returns (1992)"]
 
 
-# In[69]:
+# In[75]:
 
 
 
 ratings[23][1376]
 
 
-# In[70]:
+# In[76]:
 
 
 # which col did we put Batman Returns in? --> zero-indexed
@@ -330,22 +330,20 @@ for k in [100, 1_000, 2_000, 3_000]:
 
 # **Based on the reconstruction rank-1000 rating matrix $R_{1000}$ and the cosine similarity,** sort the movies which are most similar. You will have a function `top_cosine_similarity` which sorts data by its similarity to a movie with ID `movie_id` and returns the top $n$ items, and a second function `print_similar_movies` which prints the titles of said similar movies. Return the top 5 movies for the movie with ID `1377` (*Batman Returns*):
 
-# In[72]:
+# In[80]:
 
 
 # Sort the movies based on cosine similarity
 def top_cosine_similarity(data, movie_id, top_n=5):
     # grab the vector for the movie we want to find similar movies with
-    all_movie_ids = ratings_data.MovieID.values - 1
     movie_of_interest_id = movie_id - 1 # scalar
-    # movie_of_interest_ratings = x = data[:][movie_of_interest_id]  # for some reason the shape of this array is (3883,1)?
     movie_of_interest_ratings = x = np.array([data[row][movie_of_interest_id] for row in range(data.shape[0])])  # (6080, 1)
     # Calculate the similarity to all the other vectors
     cosine_similarity = lambda y: (x.T @ y) / (np.linalg.norm(x) * np.linalg.norm(y))
-    similarities = cosine_similarity(data)  # expected to have a shape of (3883,)
+    similarities = cosine_similarity(data)  # expected to have a shape of (data.shape[1],)
     # sort by top 5 greatest
     top_5_indices_desc_order = np.flip(np.argsort(similarities))[:6]
-    return [all_movie_ids[index] for index in top_5_indices_desc_order]
+    return top_5_indices_desc_order
 
 
 def print_similar_movies(movie_data, movieID, top_indexes):
@@ -353,14 +351,14 @@ def print_similar_movies(movie_data, movieID, top_indexes):
     sorted_similar_movie_ids = top_cosine_similarity(movie_data, movieID, top_indexes)
     for index in range(top_indexes):
         movie_id = sorted_similar_movie_ids[index + 1]
-        movie_title = movies_data[movies_data["MovieID"] == movie_id]["Title"].values[0]
+        movie_title = movies_data[movies_data["MovieID"] == movie_id + 1]["Title"].values[0]
         print(f"{index + 1}. {movie_title}.")
 
 # Print the top 5 movies for Batman Returns
 movie_id = 1377
 rank = 1000
 data = U[:, :rank] @ S[:rank, :rank] @ V[:rank, :]
-print_similar_movies(data, 1377, 5)
+print_similar_movies(data, movie_id, 5)
 
 
 # In[ ]:
